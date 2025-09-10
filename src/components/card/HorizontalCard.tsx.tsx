@@ -19,7 +19,6 @@ export interface HorizontalCardProps {
   onViewPaper?: () => void; // Add onViewPaper
   onDownloadPDF?: () => void;
   onToggleBookmark?: () => void;
-  link?: string;
   paperId?: string;
 }
 
@@ -38,7 +37,6 @@ export default function HorizontalCard({
   onViewPaper, // Add onViewPaper
   onDownloadPDF,
   onToggleBookmark,
-  link,
 }: HorizontalCardProps) {
   const router = useRouter();
 

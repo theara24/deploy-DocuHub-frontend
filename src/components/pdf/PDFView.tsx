@@ -8,7 +8,9 @@ const PDFViewer = ({ pdfUri }: { pdfUri: string }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [pdfjsLib, setPdfjsLib] = useState<typeof import('pdfjs-dist') | null>(null);
+  const [pdfjsLib, setPdfjsLib] = useState<typeof import('pdfjs-dist') | null>(
+    null
+  );
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);

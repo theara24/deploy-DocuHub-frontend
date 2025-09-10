@@ -22,10 +22,8 @@ const FeedbackCardCarousel: React.FC<FeedbackCardCarouselProps> = ({
   const [isPaused, setIsPaused] = useState(false);
   // Hydration-safe: always render 2 cards until mounted
   const [cardsPerView, setCardsPerView] = useState(2);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const getCardsPerView = () => {
       if (window.innerWidth >= 1024) return 2;
       if (window.innerWidth >= 640) return 1;
@@ -112,9 +110,6 @@ const FeedbackCardCarousel: React.FC<FeedbackCardCarouselProps> = ({
       </div>
     );
   }
-
-  // Optionally, you can render nothing until mounted to avoid mismatch
-  // if (!mounted) return null;
 
   return (
     <div

@@ -374,6 +374,7 @@ export default function StudentOverviewPage() {
                   {filteredDocuments.map((doc) => (
                     <HorizontalCard
                       key={doc.id}
+                      id={doc.id}
                       title={doc.title}
                       authors={doc.authors}
                       authorImage="/placeholder.svg?height=24&width=24"
@@ -384,7 +385,6 @@ export default function StudentOverviewPage() {
                       tags={doc.tags}
                       image={doc.image}
                       isBookmarked={doc.isWishlist}
-                      paperId={doc.paperId}
                       onDownloadPDF={() =>
                         console.log(`Download PDF for ${doc.title}`)
                       }

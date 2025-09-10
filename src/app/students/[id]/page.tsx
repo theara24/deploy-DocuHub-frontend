@@ -1,7 +1,7 @@
 import { StudentPublicProfile } from '@/components/profiles/student-public-profile';
 
 // Mock function to get student data by ID - in a real app, this would come from a database
-async function getStudentData(id: string) {
+async function getStudentData(_id: string) {
   // Mock student data - in a real app, this would be fetched from a database based on the ID
   const studentData = {
     name: 'Sarah Chen',
@@ -60,8 +60,7 @@ export default async function StudentProfilePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  const studentData = await getStudentData(id);
+  const studentData = await getStudentData((await params).id);
 
   return (
     <div className="min-h-screen bg-background py-8 px-6">

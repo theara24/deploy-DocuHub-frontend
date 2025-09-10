@@ -395,6 +395,7 @@ export default function BrowsePage() {
                 {filteredResults.map((result) => (
                   <HorizontalCard
                     key={result.id}
+                    id={result.id}
                     title={result.title}
                     authors={result.authors}
                     journal={result.journal}
@@ -404,7 +405,6 @@ export default function BrowsePage() {
                     tags={result.tags.map((tag) => tag.replace('#', ''))}
                     image={result.thumbnail}
                     isBookmarked={result.isFavorited}
-                    paperId={result.id.toString()}
                     onDownloadPDF={() =>
                       console.log('Download PDF:', result.id)
                     }

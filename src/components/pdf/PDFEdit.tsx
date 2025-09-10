@@ -12,7 +12,7 @@ import {
   Download,
   Trash2,
 } from 'lucide-react';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
 type DrawAnnotation = {
@@ -54,7 +54,7 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [pdfjsLib, setPdfjsLib] = useState<typeof import('pdfjs-dist') | null>(null);
+  // Removed unused variable: setPdfjsLib
 
   // Add download progress states
   const [downloadProgress, setDownloadProgress] = useState(0);
@@ -62,7 +62,9 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
   const [downloadType, setDownloadType] = useState<string>('');
 
   // Annotation states
-  const [tool, setTool] = useState<'none' | 'draw' | 'text' | 'highlight'>('none');
+  const [tool, setTool] = useState<'none' | 'draw' | 'text' | 'highlight'>(
+    'none'
+  );
   const [isDrawing, setIsDrawing] = useState(false);
   const [isHighlighting, setIsHighlighting] = useState(false);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
@@ -214,7 +216,8 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
       const page = await pdf.getPage(pageNumber);
       const canvas = canvasRef.current;
       const overlayCanvas = overlayCanvasRef.current;
-      const context: CanvasRenderingContext2D | undefined = canvas.getContext('2d') ?? undefined;
+      const context: CanvasRenderingContext2D | undefined =
+        canvas.getContext('2d') ?? undefined;
       const viewport = page.getViewport({ scale: 1.5 });
 
       canvas.height = viewport.height;
@@ -224,7 +227,8 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
         overlayCanvas.height = viewport.height;
         overlayCanvas.width = viewport.width;
 
-        const overlayCtx: CanvasRenderingContext2D | undefined = overlayCanvas.getContext('2d') ?? undefined;
+        const overlayCtx: CanvasRenderingContext2D | undefined =
+          overlayCanvas.getContext('2d') ?? undefined;
         if (overlayCtx) {
           overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
           overlayCtx.fillStyle = 'rgba(255,255,255,0)';
@@ -270,7 +274,9 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
     );
 
     // Only get annotations for the SPECIFIC page number (not currentPage state)
-    const pageAnnotations = annotations.filter((ann) => ann.page === pageNumber);
+    const pageAnnotations = annotations.filter(
+      (ann) => ann.page === pageNumber
+    );
 
     console.log(
       `FORCE Redrawing ${pageAnnotations.length} annotations for page ${pageNumber}`
@@ -339,23 +345,29 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
   };
 
   const loadPdf = async (pdfUrl: string) => {
-    if (!pdfjsLib) return;
-    setLoading(true);
-    setError('');
-    try {
-      const loadingTask = pdfjsLib.getDocument(pdfUrl);
-      const pdf = await loadingTask.promise;
-      setPdfDoc(pdf);
-      setTotalPages(pdf.numPages);
-      setCurrentPage(1);
-      await renderPage({ pdf, pageNumber: 1 });
-    } catch (error) {
-      console.error('Error loading PDF:', error);
-      setError('Failed to load PDF.');
-    } finally {
-      setLoading(false);
-    }
-  };
+      setLoading(true);
+      setError('');
+      try {
+        // Dynamically import pdfjs-dist and get pdfjsLib
+        const pdfjsLib = await import('pdfjs-dist');
+        // Set workerSrc if needed (for browser)
+        if (pdfjsLib.GlobalWorkerOptions) {
+          pdfjsLib.GlobalWorkerOptions.workerSrc =
+            `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        }
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        const pdf = await loadingTask.promise;
+        setPdfDoc(pdf);
+        setTotalPages(pdf.numPages);
+        setCurrentPage(1);
+        await renderPage({ pdf, pageNumber: 1 });
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+        setError('Failed to load PDF.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const goToPage = async (pageNumber: number) => {
     if (!pdfDoc || pageNumber < 1 || pageNumber > totalPages) return;
@@ -475,8 +487,10 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
         const newAnnotations = [...prev];
         const lastAnnotation = newAnnotations[newAnnotations.length - 1];
         if (lastAnnotation && lastAnnotation.type === 'highlight') {
-          (lastAnnotation as HighlightAnnotation).width = coords.x - (lastAnnotation as HighlightAnnotation).x;
-          (lastAnnotation as HighlightAnnotation).height = coords.y - (lastAnnotation as HighlightAnnotation).y;
+          (lastAnnotation as HighlightAnnotation).width =
+            coords.x - (lastAnnotation as HighlightAnnotation).x;
+          (lastAnnotation as HighlightAnnotation).height =
+            coords.y - (lastAnnotation as HighlightAnnotation).y;
         }
         return newAnnotations;
       });
@@ -583,42 +597,6 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
     } catch (error) {
       console.error('Error getting canvas as base64:', error);
       return '';
-    }
-  };
-
-  // Function to save all pages with annotations
-  const downloadAllPagesAsImages = async () => {
-    if (!pdfDoc) return;
-
-    const originalPage = currentPage;
-    const images: { page: number; dataURL: string }[] = [];
-
-    try {
-      // Go through each page and capture it
-      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-        await goToPage(pageNum);
-        // Wait a bit for the page to render
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const dataURL = getCanvasAsBase64();
-        if (dataURL) {
-          images.push({ page: pageNum, dataURL });
-        }
-      }
-
-      // Download each page
-      images.forEach(({ page, dataURL }) => {
-        const link = document.createElement('a');
-        link.download = `pdf-page-${page}-annotated.png`;
-        link.href = dataURL;
-        link.click();
-      });
-
-      // Return to original page
-      await goToPage(originalPage);
-    } catch (error) {
-      console.error('Error downloading all pages:', error);
-      setError('Failed to download all pages');
     }
   };
 
@@ -736,10 +714,10 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
   };
 
   useEffect(() => {
-    if (pdfUri && pdfjsLib) {
+    if (pdfUri && pdfDoc) {
       loadPdf(pdfUri);
     }
-  }, [pdfUri, pdfjsLib]);
+  }, [pdfUri, pdfDoc]);
 
   useEffect(() => {
     if (showTextInput && textInputRef.current) {
@@ -750,7 +728,7 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
     }
   }, [showTextInput]);
 
-  if (!pdfjsLib) {
+  if (!pdfDoc) {
     return (
       <div className="w-full max-w-6xl mx-auto p-4">
         <div className="flex items-center justify-center p-8">

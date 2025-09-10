@@ -37,11 +37,9 @@ export default function HorizontalCardCarousel({
   );
   // Hydration-safe: always render 1 card until mounted
   const [cardsToShow, setCardsToShow] = useState(1);
-  const [mounted, setMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMounted(true);
     const updateCardsToShow = () => {
       if (window.innerWidth < 1024) setCardsToShow(1);
       else setCardsToShow(2);
@@ -76,9 +74,6 @@ export default function HorizontalCardCarousel({
     const interval = setInterval(() => nextSlide(), 6000);
     return () => clearInterval(interval);
   }, [currentIndex, totalSlides, nextSlide]);
-
-  // Optionally, you can render nothing until mounted to avoid mismatch
-  // if (!mounted) return null;
 
   return (
     <div className="relative w-full max-w-7xl mx-auto px-2 sm:px-4 mt-10 md:mt-16">
