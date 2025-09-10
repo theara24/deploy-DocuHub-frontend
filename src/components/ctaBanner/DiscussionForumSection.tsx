@@ -1,5 +1,13 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
+
+// If you plan to use browser-only APIs (e.g., Date.now(), Math.random(), window, etc.),
+// move them into useEffect to avoid hydration mismatches.
+// Example:
+// const [stat, setStat] = useState(0);
+// useEffect(() => { setStat(Math.random()); }, []);
 
 const DiscussionForumSection: React.FC = () => {
   return (
@@ -52,9 +60,7 @@ const DiscussionForumSection: React.FC = () => {
 
           <div className="bg-card rounded-xl px-6 py-8 flex flex-col items-center shadow-md w-28">
             <span className="text-blue-600 font-bold text-3xl">98+</span>
-            <span className="text-buttons mt-2">
-              Discussions
-            </span>
+            <span className="text-buttons mt-2">Discussions</span>
           </div>
 
           <div className="bg-card rounded-xl px-6 py-8 flex flex-col items-center shadow-md w-28">
