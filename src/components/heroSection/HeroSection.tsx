@@ -40,7 +40,7 @@ const HeroSection: FC = () => {
         </h1>
 
         <p className="mb-6 text-foreground text-lg">
-          <span className="text-orange-500 font-semibold">DocuHub</span>{' '}
+          <span className="text-accent font-semibold">DocuHub</span>{' '}
           {t('hero_description', {
             defaultValue:
               'is your space for research and innovation. Explore papers, connect with experts, and showcase your work globally.',

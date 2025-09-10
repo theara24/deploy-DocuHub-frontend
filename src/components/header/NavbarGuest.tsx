@@ -107,8 +107,8 @@ export default function NavbarGuest() {
               <Image
                   src={currentLang === 'en' ? '/flag-UK.svg' : '/flag-Cam.svg'}
                   alt="flag"
-                  width={45}
-                  height={25}
+                  width={35}
+                  height={15}
                   className="rounded-[8px]"
               />
               <span className="text-foreground font-medium">
