@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { BookOpen, Calendar, Award, Star, Download, Eye } from 'lucide-react';
 
-interface HorizontalCardProps {
+export interface HorizontalCardProps {
   id: number; // Replace paperId with id
   title: string;
   authors: string[];
@@ -20,6 +20,7 @@ interface HorizontalCardProps {
   onDownloadPDF?: () => void;
   onToggleBookmark?: () => void;
   link?: string;
+  paperId?: string;
 }
 
 export default function HorizontalCard({
