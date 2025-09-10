@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { BookOpen, Calendar, Award, Star, Download, Eye } from 'lucide-react';
 
 export interface HorizontalCardProps {
-  id: number; // Replace paperId with id
+  id: number;
   title: string;
   authors: string[];
   authorImage?: string;
@@ -16,7 +16,7 @@ export interface HorizontalCardProps {
   tags: string[];
   image: string;
   isBookmarked?: boolean;
-  onViewPaper?: () => void; // Add onViewPaper
+  onViewPaper?: () => void;
   onDownloadPDF?: () => void;
   onToggleBookmark?: () => void;
   paperId?: string;

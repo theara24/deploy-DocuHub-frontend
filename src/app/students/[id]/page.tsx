@@ -1,15 +1,16 @@
+// src/app/students/[id]/page.tsx
 import { StudentPublicProfile } from '@/components/profiles/student-public-profile';
 
-// Mock function to get student data by ID - in a real app, this would come from a database
-async function getStudentData() {
-  // Mock student data - in a real app, this would be fetched from a database based on the ID
+// Mock function to get student data by ID
+async function getStudentData(id: string) {
+  // In a real app, fetch data based on id
   const studentData = {
     name: 'Sarah Chen',
     school: 'Stanford University',
     year: 'Graduate Student - 2nd Year',
     major: 'Computer Science',
     avatar: '/placeholder.svg?height=128&width=128',
-    bio: 'Graduate student passionate about machine learning applications in healthcare. Currently working on research projects involving AI-driven diagnostic tools and exploring the intersection of technology and medicine. Interested in developing solutions that can improve patient outcomes through intelligent systems.',
+    bio: 'Graduate student passionate about machine learning applications in healthcare...',
     researchInterests: [
       'Machine Learning',
       'Healthcare Technology',
@@ -51,16 +52,15 @@ async function getStudentData() {
       orcid: 'https://orcid.org/0000-0000-0000-0001',
     },
   };
-
   return studentData;
 }
 
-export default async function StudentProfilePage() {
-  const studentData = await getStudentData();
+export default async function StudentProfilePage({ params }: { params: { id: string } }) {
+  const studentData = await getStudentData(params.id);
 
   return (
-    <div className="min-h-screen bg-background py-8 px-6">
-      <StudentPublicProfile student={studentData} />
-    </div>
+      <div className="min-h-screen bg-background py-8 px-6">
+        <StudentPublicProfile student={studentData} />
+      </div>
   );
 }
