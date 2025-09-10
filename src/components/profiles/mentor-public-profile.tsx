@@ -235,84 +235,84 @@ export function MentorPublicProfile({ mentor }: MentorPublicProfileProps) {
       <div className="grid grid-cols-1 gap-5 mb-20">
         {/* Research Interests */}
         <Card>
-            <CardHeader>
-              <CardTitle>Research Interests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {mentor.researchInterests.map((interest, index) => (
-                  <Badge key={index} variant="secondary">
-                    {interest}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <CardHeader>
+            <CardTitle>Research Interests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {mentor.researchInterests.map((interest, index) => (
+                <Badge key={index} variant="secondary">
+                  {interest}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Mentored Works */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="h-5 w-5" />
-                Mentored Works
-              </CardTitle>
-              <CardDescription>Papers guided to publication</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {mentor.mentoredWorks.map((work, index) => (
-                  <div key={index} className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="font-medium">{work.title}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        By {work.author} • {work.year}
-                      </p>
-                    </div>
-                    {work.link && (
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    )}
+        {/* Mentored Works */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="h-5 w-5" />
+              Mentored Works
+            </CardTitle>
+            <CardDescription>Papers guided to publication</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {mentor.mentoredWorks.map((work, index) => (
+                <div key={index} className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="font-medium">{work.title}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      By {work.author} • {work.year}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  {work.link && (
+                    <Button variant="ghost" size="sm">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Publications */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                Recent Publications
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {mentor.publications.length > 0 ? (
-                  mentor.publications.map((publication, index) => (
-                    <HorizontalCard
-                      key={index}
-                      title={publication.title}
-                      authors={[mentor.name]} // Placeholder author
-                      journal={publication.journal}
-                      year={publication.year}
-                      citations="N/A" // Placeholder citations
-                      abstract="No abstract available." // Placeholder abstract
-                      tags={mentor.researchInterests.slice(0, 2)} // Use research interests as tags
-                      image="https://idpdefault.s3.ap-south-1.amazonaws.com/589465a620a8be4fd4220240116115232.jpg" // Placeholder image
-                      paperId={index.toString()} // Placeholder ID
-                      link={publication.link}
-                    />
-                  ))
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">
-                    No publications yet
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Publications */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Recent Publications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {mentor.publications.length > 0 ? (
+                mentor.publications.map((publication, index) => (
+                  <HorizontalCard
+                    key={index}
+                    id={index}
+                    title={publication.title}
+                    authors={[mentor.name]} // Placeholder author
+                    journal={publication.journal}
+                    year={publication.year}
+                    citations="N/A" // Placeholder citations
+                    abstract="No abstract available." // Placeholder abstract
+                    tags={mentor.researchInterests.slice(0, 2)} // Use research interests as tags
+                    image="https://idpdefault.s3.ap-south-1.amazonaws.com/589465a620a8be4fd4220240116115232.jpg" // Placeholder image
+                    paperId={index.toString()} // Placeholder ID
+                  />
+                ))
+              ) : (
+                <p className="text-muted-foreground text-center py-8">
+                  No publications yet
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

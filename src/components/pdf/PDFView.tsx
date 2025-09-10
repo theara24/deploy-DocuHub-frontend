@@ -1,5 +1,5 @@
 import { AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
 const PDFViewer = ({ pdfUri }: { pdfUri: string }) => {
@@ -34,55 +34,61 @@ const PDFViewer = ({ pdfUri }: { pdfUri: string }) => {
     loadPdfjs();
   }, []);
 
-  const renderPage = async ({
-    pdf,
-    pageNumber,
-  }: {
-    pdf: PDFDocumentProxy;
-    pageNumber: number;
-  }) => {
-    if (!pdf || !canvasRef.current) return;
-    try {
-      const page = await pdf.getPage(pageNumber);
-      const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
-      const viewport = page.getViewport({ scale: 1.5 });
+  const renderPage = useCallback(
+    async ({
+      pdf,
+      pageNumber,
+    }: {
+      pdf: PDFDocumentProxy;
+      pageNumber: number;
+    }) => {
+      if (!pdf || !canvasRef.current) return;
+      try {
+        const page = await pdf.getPage(pageNumber);
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        const viewport = page.getViewport({ scale: 1.5 });
 
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
 
-      // Render the PDF page (add 'canvas' property for RenderParameters)
-      await page.render({
-        canvasContext: context!,
-        canvas: canvas,
-        viewport: viewport,
-      }).promise;
+        // Render the PDF page (add 'canvas' property for RenderParameters)
+        await page.render({
+          canvasContext: context!,
+          canvas: canvas,
+          viewport: viewport,
+        }).promise;
 
-      console.log(`Page ${pageNumber} rendered successfully`);
-    } catch (error) {
-      console.error(`Error rendering page ${pageNumber}:`, error);
-      setError(`Failed to render page ${pageNumber}`);
-    }
-  };
+        console.log(`Page ${pageNumber} rendered successfully`);
+      } catch (error) {
+        console.error(`Error rendering page ${pageNumber}:`, error);
+        setError(`Failed to render page ${pageNumber}`);
+      }
+    },
+    []
+  );
 
-  const loadPdf = async (pdfUrl: string) => {
-    if (!pdfjsLib) return;
-    setLoading(true);
-    setError('');
-    try {
-      const loadingTask = pdfjsLib.getDocument(pdfUrl);
-      const pdf = await loadingTask.promise;
-      setPdfDoc(pdf);
-      setTotalPages(pdf.numPages);
-      setCurrentPage(1);
-      await renderPage({ pdf, pageNumber: 1 });
-    } catch (error) {
-      console.error('Error loading PDF:', error);
-      setError('Failed to load PDF.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loadPdf = useCallback(
+    async (pdfUrl: string) => {
+      if (!pdfjsLib) return;
+      setLoading(true);
+      setError('');
+      try {
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        const pdf = await loadingTask.promise;
+        setPdfDoc(pdf);
+        setTotalPages(pdf.numPages);
+        setCurrentPage(1);
+        await renderPage({ pdf, pageNumber: 1 });
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+        setError('Failed to load PDF.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [pdfjsLib, renderPage]
+  );
 
   const goToPage = async (pageNumber: number) => {
     if (!pdfDoc || pageNumber < 1 || pageNumber > totalPages) return;
@@ -108,7 +114,7 @@ const PDFViewer = ({ pdfUri }: { pdfUri: string }) => {
     if (pdfUri && pdfjsLib) {
       loadPdf(pdfUri);
     }
-  }, [pdfUri, pdfjsLib]);
+  }, [pdfUri, pdfjsLib, loadPdf]);
 
   if (!pdfjsLib) {
     return (

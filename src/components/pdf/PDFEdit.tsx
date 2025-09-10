@@ -12,7 +12,7 @@ import {
   Download,
   Trash2,
 } from 'lucide-react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
 type DrawAnnotation = {
@@ -203,148 +203,170 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
   };
   // --- End missing functions ---
 
-  // Update your renderPage function to properly clear and redraw
-  const renderPage = async ({
-    pdf,
-    pageNumber,
-  }: {
-    pdf: PDFDocumentProxy;
-    pageNumber: number;
-  }) => {
-    if (!pdf || !canvasRef.current) return;
-    try {
-      const page = await pdf.getPage(pageNumber);
-      const canvas = canvasRef.current;
-      const overlayCanvas = overlayCanvasRef.current;
-      const context: CanvasRenderingContext2D | undefined =
-        canvas.getContext('2d') ?? undefined;
-      const viewport = page.getViewport({ scale: 1.5 });
-
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      if (overlayCanvas) {
-        overlayCanvas.height = viewport.height;
-        overlayCanvas.width = viewport.width;
-
-        const overlayCtx: CanvasRenderingContext2D | undefined =
-          overlayCanvas.getContext('2d') ?? undefined;
-        if (overlayCtx) {
-          overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-          overlayCtx.fillStyle = 'rgba(255,255,255,0)';
-          overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-          overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-        }
-      }
-
-      // Fix: Add the required 'canvas' property to RenderParameters
-      await page.render({
-        canvasContext: context!,
-        canvas: canvas,
-        viewport: viewport,
-      }).promise;
-
-      setTimeout(() => {
-        forceRedrawCurrentPageOnly(pageNumber);
-      }, 150);
-    } catch (error) {
-      setError(`Failed to render page ${pageNumber}`);
-    }
-  };
-
   // Add a new function that forces redraw only for specific page
-  const forceRedrawCurrentPageOnly = (pageNumber: number) => {
-    if (!overlayCanvasRef.current) {
-      console.log('No overlay canvas available');
-      return;
-    }
-
-    const ctx = overlayCanvasRef.current.getContext('2d');
-    if (!ctx) {
-      console.log('No canvas context available');
-      return;
-    }
-
-    // FORCE clear again
-    ctx.clearRect(
-      0,
-      0,
-      overlayCanvasRef.current.width,
-      overlayCanvasRef.current.height
-    );
-
-    // Only get annotations for the SPECIFIC page number (not currentPage state)
-    const pageAnnotations = annotations.filter(
-      (ann) => ann.page === pageNumber
-    );
-
-    console.log(
-      `FORCE Redrawing ${pageAnnotations.length} annotations for page ${pageNumber}`
-    );
-    console.log(
-      'Page annotations:',
-      pageAnnotations.map((a) => ({ page: a.page, type: a.type, id: a.id }))
-    );
-
-    if (pageAnnotations.length === 0) {
-      console.log(`No annotations found for page ${pageNumber}`);
-      return;
-    }
-
-    pageAnnotations.forEach((annotation, index) => {
-      console.log(`Drawing annotation ${index} on page ${pageNumber}:`, {
-        type: annotation.type,
-        page: annotation.page,
-        id: annotation.id,
-      });
-
-      ctx.save();
-
-      try {
-        if (annotation.type === 'draw') {
-          ctx.strokeStyle = annotation.color || 'red';
-          ctx.lineWidth = annotation.strokeWidth || 2;
-          ctx.lineCap = 'round';
-          ctx.lineJoin = 'round';
-
-          if (annotation.points && annotation.points.length > 0) {
-            ctx.beginPath();
-            annotation.points.forEach((point, pointIndex) => {
-              if (pointIndex === 0) {
-                ctx.moveTo(point.x, point.y);
-              } else {
-                ctx.lineTo(point.x, point.y);
-              }
-            });
-            ctx.stroke();
-          }
-        } else if (annotation.type === 'highlight') {
-          ctx.fillStyle = (annotation.color || 'yellow') + '50';
-          ctx.fillRect(
-            annotation.x || 0,
-            annotation.y || 0,
-            annotation.width || 100,
-            annotation.height || 20
-          );
-        } else if (annotation.type === 'text') {
-          ctx.fillStyle = annotation.color || 'black';
-          ctx.font = `${annotation.fontSize || 16}px Arial`;
-          ctx.textBaseline = 'top';
-          ctx.fillText(
-            annotation.text || '',
-            annotation.x || 0,
-            annotation.y || 0
-          );
-        }
-      } catch (error) {
-        console.error('Error drawing annotation:', error, annotation);
+  const forceRedrawCurrentPageOnly = useCallback(
+    (pageNumber: number) => {
+      if (!overlayCanvasRef.current) {
+        console.log('No overlay canvas available');
+        return;
       }
 
-      ctx.restore();
-    });
-  };
+      const ctx = overlayCanvasRef.current.getContext('2d');
+      if (!ctx) {
+        console.log('No canvas context available');
+        return;
+      }
 
-  const loadPdf = async (pdfUrl: string) => {
+      // FORCE clear again
+      ctx.clearRect(
+        0,
+        0,
+        overlayCanvasRef.current.width,
+        overlayCanvasRef.current.height
+      );
+
+      // Only get annotations for the SPECIFIC page number (not currentPage state)
+      const pageAnnotations = annotations.filter(
+        (ann) => ann.page === pageNumber
+      );
+
+      console.log(
+        `FORCE Redrawing ${pageAnnotations.length} annotations for page ${pageNumber}`
+      );
+      console.log(
+        'Page annotations:',
+        pageAnnotations.map((a) => ({ page: a.page, type: a.type, id: a.id }))
+      );
+
+      if (pageAnnotations.length === 0) {
+        console.log(`No annotations found for page ${pageNumber}`);
+        return;
+      }
+
+      pageAnnotations.forEach((annotation, index) => {
+        console.log(`Drawing annotation ${index} on page ${pageNumber}:`, {
+          type: annotation.type,
+          page: annotation.page,
+          id: annotation.id,
+        });
+
+        ctx.save();
+
+        try {
+          if (annotation.type === 'draw') {
+            ctx.strokeStyle = annotation.color || 'red';
+            ctx.lineWidth = annotation.strokeWidth || 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            if (annotation.points && annotation.points.length > 0) {
+              ctx.beginPath();
+              annotation.points.forEach((point, pointIndex) => {
+                if (pointIndex === 0) {
+                  ctx.moveTo(point.x, point.y);
+                } else {
+                  ctx.lineTo(point.x, point.y);
+                }
+              });
+              ctx.stroke();
+            }
+          } else if (annotation.type === 'highlight') {
+            ctx.fillStyle = (annotation.color || 'yellow') + '50';
+            ctx.fillRect(
+              annotation.x || 0,
+              annotation.y || 0,
+              annotation.width || 100,
+              annotation.height || 20
+            );
+          } else if (annotation.type === 'text') {
+            ctx.fillStyle = annotation.color || 'black';
+            ctx.font = `${annotation.fontSize || 16}px Arial`;
+            ctx.textBaseline = 'top';
+            ctx.fillText(
+              annotation.text || '',
+              annotation.x || 0,
+              annotation.y || 0
+            );
+          }
+        } catch (error) {
+          console.error('Error drawing annotation:', error, annotation);
+        }
+
+        ctx.restore();
+      });
+    },
+    [annotations]
+  );
+
+  // Update your renderPage function to properly clear and redraw
+  const renderPage = useCallback(
+    async ({
+      pdf,
+      pageNumber,
+    }: {
+      pdf: PDFDocumentProxy;
+      pageNumber: number;
+    }) => {
+      if (!pdf || !canvasRef.current) return;
+      try {
+        const page = await pdf.getPage(pageNumber);
+        const canvas = canvasRef.current;
+        const overlayCanvas = overlayCanvasRef.current;
+        const context: CanvasRenderingContext2D | undefined =
+          canvas.getContext('2d') ?? undefined;
+        const viewport = page.getViewport({ scale: 1.5 });
+
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        if (overlayCanvas) {
+          overlayCanvas.height = viewport.height;
+          overlayCanvas.width = viewport.width;
+
+          const overlayCtx: CanvasRenderingContext2D | undefined =
+            overlayCanvas.getContext('2d') ?? undefined;
+          if (overlayCtx) {
+            overlayCtx.clearRect(
+              0,
+              0,
+              overlayCanvas.width,
+              overlayCanvas.height
+            );
+            overlayCtx.fillStyle = 'rgba(255,255,255,0)';
+            overlayCtx.fillRect(
+              0,
+              0,
+              overlayCanvas.width,
+              overlayCanvas.height
+            );
+            overlayCtx.clearRect(
+              0,
+              0,
+              overlayCanvas.width,
+              overlayCanvas.height
+            );
+          }
+        }
+
+        // Fix: Add the required 'canvas' property to RenderParameters
+        await page.render({
+          canvasContext: context!,
+          canvas: canvas,
+          viewport: viewport,
+        }).promise;
+
+        setTimeout(() => {
+          forceRedrawCurrentPageOnly(pageNumber);
+        }, 150);
+      } catch {
+        setError(`Failed to render page ${pageNumber}`);
+      }
+    },
+    [forceRedrawCurrentPageOnly]
+  );
+
+  const loadPdf = useCallback(
+    async (pdfUrl: string) => {
       setLoading(true);
       setError('');
       try {
@@ -352,8 +374,7 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
         const pdfjsLib = await import('pdfjs-dist');
         // Set workerSrc if needed (for browser)
         if (pdfjsLib.GlobalWorkerOptions) {
-          pdfjsLib.GlobalWorkerOptions.workerSrc =
-            `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
         }
         const loadingTask = pdfjsLib.getDocument(pdfUrl);
         const pdf = await loadingTask.promise;
@@ -361,13 +382,14 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
         setTotalPages(pdf.numPages);
         setCurrentPage(1);
         await renderPage({ pdf, pageNumber: 1 });
-      } catch (error) {
-        console.error('Error loading PDF:', error);
+      } catch {
         setError('Failed to load PDF.');
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [renderPage]
+  );
 
   const goToPage = async (pageNumber: number) => {
     if (!pdfDoc || pageNumber < 1 || pageNumber > totalPages) return;
@@ -572,71 +594,6 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
     return combinedCanvas;
   };
 
-  // Function to download the combined canvas as an image
-  const downloadCanvasAsImage = (format: 'png' | 'jpeg' = 'png') => {
-    try {
-      const combinedCanvas = combineCanvases();
-      const dataURL = combinedCanvas.toDataURL(`image/${format}`);
-
-      // Create download link
-      const link = document.createElement('a');
-      link.download = `pdf-page-${currentPage}-annotated.${format}`;
-      link.href = dataURL;
-      link.click();
-    } catch (error) {
-      console.error('Error downloading canvas:', error);
-      setError('Failed to download canvas image');
-    }
-  };
-
-  // Function to get the combined canvas as a base64 string
-  const getCanvasAsBase64 = (format: 'png' | 'jpeg' = 'png'): string => {
-    try {
-      const combinedCanvas = combineCanvases();
-      return combinedCanvas.toDataURL(`image/${format}`);
-    } catch (error) {
-      console.error('Error getting canvas as base64:', error);
-      return '';
-    }
-  };
-
-  // Function to save to server (if you want to upload the image)
-  const saveCanvasToServer = async () => {
-    try {
-      const base64Data = getCanvasAsBase64();
-      if (!base64Data) return;
-
-      // Convert base64 to blob
-      const response = await fetch(base64Data);
-      const blob = await response.blob();
-
-      // Create form data
-      const formData = new FormData();
-      formData.append('file', blob, `pdf-page-${currentPage}-annotated.png`);
-
-      // Upload to your server
-      const uploadResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/media`, // You might need to adjust the endpoint
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-
-      if (uploadResponse.ok) {
-        const result = await uploadResponse.json();
-        console.log('Canvas saved to server successfully', result);
-        // You might want to show a success message to the user
-        setError(''); // Clear any previous errors
-      } else {
-        throw new Error('Failed to save to server');
-      }
-    } catch (error) {
-      console.error('Error saving canvas to server:', error);
-      setError('Failed to save canvas to server');
-    }
-  };
-
   // Alternative function to create PDF and download locally first
   const createPDFAndDownload = async () => {
     try {
@@ -717,7 +674,7 @@ const PDFEdit = ({ pdfUri }: { pdfUri: string }) => {
     if (pdfUri && pdfDoc) {
       loadPdf(pdfUri);
     }
-  }, [pdfUri, pdfDoc]);
+  }, [pdfUri, pdfDoc, loadPdf]);
 
   useEffect(() => {
     if (showTextInput && textInputRef.current) {

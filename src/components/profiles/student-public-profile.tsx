@@ -291,7 +291,6 @@ export function StudentPublicProfile({ student }: StudentPublicProfileProps) {
                     abstract="No abstract available." // Placeholder abstract
                     tags={student.researchInterests.slice(0, 2)} // Use research interests as tags
                     image="https://idpdefault.s3.ap-south-1.amazonaws.com/589465a620a8be4fd4220240116115232.jpg" // Placeholder image
-                    link={paper.link}
                   />
                 ))}
               </div>
