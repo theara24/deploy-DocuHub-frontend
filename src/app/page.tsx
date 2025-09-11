@@ -164,14 +164,14 @@ export default function Home() {
       <DevelopmentServicesBanner />
 
       {/* Card Section */}
-      <section className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-[var(--color-foreground)] mb-4 sm:mb-6 lg:mb-8">
+      <section className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-12">
+        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-[var(--color-foreground)] mb-2 sm:mb-4 md:mb-6 lg:mb-8">
           {t('newDocuments')}
         </h2>
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-2 sm:mb-4 md:mb-6">
           <ButtonScrollHorizontal />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {researchPapers.map((paper) => (
             <VerticalCard
               key={paper.id}
@@ -194,8 +194,8 @@ export default function Home() {
       </section>
 
       {/* Most Popular Documents */}
-      <section className="w-full px-4 py-12 bg-background">
-        <h2 className="text-section-headings text-center mb-10">
+      <section className="w-full px-2 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12 bg-background">
+        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-section-headings text-center mb-6 sm:mb-8 md:mb-10">
           {t('popularDocuments')}
         </h2>
         <HorizontalCardCarousel
@@ -213,25 +213,25 @@ export default function Home() {
       <DiscussionForumSection />
 
       {/* Feedback Section */}
-      <section className="w-full py-12">
+      <section className="w-full py-6 sm:py-8 md:py-12">
         {/* Banner */}
-        <div className="relative w-full h-72 sm:h-80 md:h-96 lg:h-[28rem] bg-[url('/banner/feedbackBanner.png')] bg-cover bg-center">
+        <div className="relative w-full h-40 sm:h-56 md:h-72 lg:h-[28rem] bg-[url('/banner/feedbackBanner.png')] bg-cover bg-center">
           {/* Overlay */}
           <div className="absolute inset-0 bg-black/60"></div>
 
           {/* Text Content */}
-          <div className="absolute top-1/2 left-1/3 transform -translate-x-1/2 -translate-y-1/2 px-4 sm:text-left sm:px-10 z-10">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-4">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-2 sm:px-4 md:px-6 text-center sm:text-left sm:pl-10 z-10">
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-5xl font-bold text-white mb-1 sm:mb-2 md:mb-4">
               {t('banner.title')}
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-200">
+            <p className="text-sm sm:text-base md:text-lg text-gray-200">
               {t('banner.subtitle')}
             </p>
           </div>
         </div>
 
         {/* Carousel */}
-        <div className="max-w-7xl mx-auto -mt-32 mb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[90%] sm:max-w-[85%] md:max-w-7xl mx-auto -mt-16 sm:-mt-20 md:-mt-32 mb-8 sm:mb-12 md:mb-20 px-2 sm:px-4 md:px-6 lg:px-8">
           <FeedbackCardCarousel
             feedbacks={feedbacksData}
             autoPlay

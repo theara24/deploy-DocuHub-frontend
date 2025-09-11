@@ -80,69 +80,43 @@
 /* Typography utilities */
 @layer utilities {
   .text-hero-title {
-    font-size: 60px;
-    line-height: 120px;
-    @apply font-bold;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-relaxed;
   }
   .text-hero-subtitle {
-    font-size: 54px;
-    line-height: normal;
-    @apply font-bold;
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold;
   }
   .text-section-headings {
-    font-size: 36px;
-    line-height: normal;
-    @apply font-bold;
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold;
   }
   .text-subheadings {
-    font-size: 20px;
-    line-height: normal;
-    @apply font-semibold;
+    @apply text-base sm:text-lg md:text-xl lg:text-2xl font-semibold;
   }
   .text-body-text {
-    font-size: 18px;
-    line-height: normal;
-    @apply font-normal;
+    @apply text-sm sm:text-base md:text-lg lg:text-xl font-normal;
   }
   .text-small-text {
-    font-size: 14px;
-    line-height: normal;
-    @apply font-normal;
+    @apply text-xs sm:text-sm md:text-base lg:text-lg font-normal;
   }
   .text-buttons {
-    font-size: 18px;
-    line-height: normal;
-    @apply font-medium;
+    @apply text-sm sm:text-base md:text-lg lg:text-xl font-medium;
   }
   .text-navigation-links {
-    font-size: 16px;
-    line-height: normal;
-    @apply font-medium;
+    @apply text-xs sm:text-sm md:text-base lg:text-lg font-medium;
   }
   .text-footer-links {
-    font-size: 16px;
-    line-height: normal;
-    @apply font-normal;
+    @apply text-xs sm:text-sm md:text-base lg:text-lg font-normal;
   }
   .text-quote {
-    font-size: 20px;
-    line-height: normal;
-    @apply italic;
+    @apply text-base sm:text-lg md:text-xl lg:text-2xl italic;
   }
   .text-descriptions {
-    font-size: 20px;
-    line-height: normal;
-    @apply font-normal;
+    @apply text-base sm:text-lg md:text-xl lg:text-2xl font-normal;
   }
   .text-display-large {
-    font-size: 96px;
-    line-height: normal;
-    @apply font-bold;
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold;
   }
   .text-display-alt {
-    font-size: 60px;
-    line-height: 120px;
-    @apply font-bold;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-relaxed;
   }
 
   /* Color */
